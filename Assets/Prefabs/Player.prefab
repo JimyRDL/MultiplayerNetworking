@@ -228,6 +228,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 9156aad8-3f9e-4791-8626-0c4bc985e9fb
     m_ActionName: 'Player/Interact[/Keyboard/e]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5890548673252993877}
+        m_TargetAssemblyTypeName: PlayerControllerNB, Assembly-CSharp
+        m_MethodName: OnSprinting
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: e56e595b-3e44-4b97-9048-9fdeda7d301a
+    m_ActionName: 'Player/Sprinting[/Keyboard/leftShift]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -299,6 +315,7 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 2300676277740862292}
   _networkObjectCache: {fileID: 2300676277740862292}
   movementSpeed: 7
+  sprintingSpeed: 11
   jumpForce: 4
   checkGroundRadius: 0.35
   gravityPower: 15

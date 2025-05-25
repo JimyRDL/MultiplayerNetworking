@@ -10,6 +10,7 @@ public class PlayerControllerNB : NetworkBehaviour
 {
      [Header("Movement Variables")] 
      [SerializeField] private float movementSpeed = 10f;
+     [SerializeField] private float sprintingSpeed = 11f;
      [SerializeField] private float jumpForce = 10f;
      [SerializeField] private float checkGroundRadius;
      [SerializeField] private float gravityPower = 15f;
@@ -28,6 +29,7 @@ public class PlayerControllerNB : NetworkBehaviour
      [Header("States")]
      private bool canMove = true;
      private bool isGrounded = true;
+     private bool isSprinting = false;
 
      public override void OnStartClient()
      {
@@ -65,7 +67,8 @@ public class PlayerControllerNB : NetworkBehaviour
           if (moveInput == Vector2.zero || !canMove)
                return;
           movement = transform.forward * moveInput.y + transform.right * moveInput.x;
-          playerRigidbody.MovePosition(playerRigidbody.position + movement * (movementSpeed * Time.fixedDeltaTime));
+          float speed = isSprinting ? sprintingSpeed : movementSpeed;
+          playerRigidbody.MovePosition(playerRigidbody.position + movement * (speed * Time.fixedDeltaTime));
      }
      private void DetectGround()
      {
@@ -91,6 +94,14 @@ public class PlayerControllerNB : NetworkBehaviour
                return;
           if(ctx.performed && isGrounded)
                playerRigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+     }
+
+     public void OnSprinting(InputAction.CallbackContext ctx)
+     {
+          if (ctx.performed)
+               isSprinting = true;
+          if (ctx.canceled)
+               isSprinting = false;
      }
      
 }
