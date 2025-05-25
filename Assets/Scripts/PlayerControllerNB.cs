@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using FishNet.Object;
 using UnityEngine.InputSystem;
+using Quaternion = UnityEngine.Quaternion;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerControllerNB : NetworkBehaviour
@@ -9,21 +11,19 @@ public class PlayerControllerNB : NetworkBehaviour
      [Header("Movement Variables")] 
      [SerializeField] private float movementSpeed = 10f;
      [SerializeField] private float jumpForce = 10f;
-     [SerializeField] private float lookXSpeed;
-     [SerializeField] private float lookYSpeed;
      [SerializeField] private float checkGroundRadius;
+     [SerializeField] private float gravityPower = 15f;
 
      private Vector2 moveInput;
      private Vector3 movement;
-     private Vector2 lookInput;
+
      
      [Header("References")]
-     private Camera playerCamera;
      private Rigidbody playerRigidbody;
-     [SerializeField] private Transform cameraTransform;
      [SerializeField] private LayerMask groundLayer;
      [SerializeField] private Transform checkGroundTransform;
      [SerializeField] private MeshRenderer playerRenderer;
+     [SerializeField] private InputActionReference lookInputReference;
 
      [Header("States")]
      private bool canMove = true;
@@ -32,15 +32,8 @@ public class PlayerControllerNB : NetworkBehaviour
      public override void OnStartClient()
      {
           base.OnStartClient();
-          if (base.IsOwner)
-          {
-               playerCamera = Camera.main;
-               playerCamera.transform.position =cameraTransform.position;
-               playerCamera.transform.SetParent(transform);
-               playerRenderer.enabled = false;
-               
-          } else 
-               gameObject.GetComponent<PlayerControllerNB>().enabled = false; 
+          enabled = IsOwner;
+          playerRenderer.enabled = !IsOwner;
      }
 
      private void Awake()
@@ -48,18 +41,30 @@ public class PlayerControllerNB : NetworkBehaviour
           playerRigidbody = GetComponent<Rigidbody>();
      }
 
+     private void Start()
+     {
+          Cursor.lockState = CursorLockMode.Locked;
+     }
+     
+
      private void FixedUpdate()
      {
           MovePlayer();
           DetectGround();
+          ApplyGravity();
      }
-     
+     private void ApplyGravity()
+     {
+          if (isGrounded)
+               playerRigidbody.AddForce(Vector3.down * gravityPower, ForceMode.Acceleration);
+     }
+
 
      private void MovePlayer()
      {
           if (moveInput == Vector2.zero || !canMove)
                return;
-          movement = new Vector3(moveInput.x, 0, moveInput.y);
+          movement = transform.forward * moveInput.y + transform.right * moveInput.x;
           playerRigidbody.MovePosition(playerRigidbody.position + movement * (movementSpeed * Time.fixedDeltaTime));
      }
      private void DetectGround()
@@ -75,17 +80,17 @@ public class PlayerControllerNB : NetworkBehaviour
 
      public void OnMove(InputAction.CallbackContext ctx)
      {
+          if (!IsOwner)
+               return;
           moveInput = ctx.ReadValue<Vector2>();
      }
 
      public void OnJump(InputAction.CallbackContext ctx)
      {
+          if (!IsOwner)
+               return;
           if(ctx.performed && isGrounded)
                playerRigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
      }
-
-     public void OnLook(InputAction.CallbackContext ctx)
-     {
-          
-     }
+     
 }
