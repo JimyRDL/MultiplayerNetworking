@@ -25,6 +25,7 @@ public class PlayerControllerNB : NetworkBehaviour
      [SerializeField] private Transform checkGroundTransform;
      [SerializeField] private MeshRenderer playerRenderer;
      [SerializeField] private InputActionReference lookInputReference;
+     [SerializeField] private PlayerInput playerInput;
 
      [Header("States")]
      private bool canMove = true;
@@ -34,8 +35,13 @@ public class PlayerControllerNB : NetworkBehaviour
      public override void OnStartClient()
      {
           base.OnStartClient();
-          enabled = IsOwner;
-          playerRenderer.enabled = !IsOwner;
+          if (!IsOwner)
+          {
+               enabled = false;
+               playerInput.enabled = false;
+               return;
+          }
+          Cursor.lockState = CursorLockMode.Locked;
      }
 
      private void Awake()
@@ -43,10 +49,6 @@ public class PlayerControllerNB : NetworkBehaviour
           playerRigidbody = GetComponent<Rigidbody>();
      }
 
-     private void Start()
-     {
-          Cursor.lockState = CursorLockMode.Locked;
-     }
      
 
      private void FixedUpdate()

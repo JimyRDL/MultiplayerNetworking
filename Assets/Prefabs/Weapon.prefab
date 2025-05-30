@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4000013430562122}
-  - component: {fileID: -1405957453866259322}
   - component: {fileID: -5851051682677377231}
+  - component: {fileID: 4794083571525517353}
   m_Layer: 0
   m_Name: Weapon
   m_TagString: Untagged
@@ -40,21 +40,6 @@ Transform:
   - {fileID: 4000013245320828}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-1405957453866259322
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000010634607710}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 200dabb8451971646be637e6eb02e27b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: -5851051682677377231}
-  _networkObjectCache: {fileID: 0}
 --- !u!114 &-5851051682677377231
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -108,6 +93,22 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0, w: 1}
     Scale: {x: 0.2, y: 0.2, z: 0.2}
     IsValid: 1
+--- !u!114 &4794083571525517353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000010634607710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 740957ed1a28455b9787077c3eb18cc6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: -5851051682677377231}
+  _networkObjectCache: {fileID: 0}
+  damage: 10
 --- !u!1 &1000011046169406
 GameObject:
   m_ObjectHideFlags: 0

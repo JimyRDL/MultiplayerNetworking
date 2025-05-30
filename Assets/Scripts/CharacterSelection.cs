@@ -36,10 +36,12 @@ public class CharacterSelection : NetworkBehaviour
     {
         GameObject player = Instantiate(characterPrefab);
         player.SetActive(true);
+        player.gameObject.name = "Player" + conn;
         Spawn(player, conn);
 
         if (player.TryGetComponent(out PlayerWeaponManagerNB weaponManager))
         {
+            Debug.Log(weapons[weaponIndex]);
             weaponManager.SetupWeapon(weapons[weaponIndex], conn);
         }
     }

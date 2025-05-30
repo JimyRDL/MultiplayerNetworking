@@ -1,4 +1,6 @@
+using System;
 using FishNet.Connection;
+using FishNet.Example.ColliderRollbacks;
 using FishNet.Object;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -9,13 +11,20 @@ public class PlayerWeaponManagerNB : NetworkBehaviour
     public Transform weaponHolder;
     private Weapon actualWeapon;
 
+    private PlayerCameraControllerNB cameraController;
+    [SerializeField] private LayerMask enemiesLayerMask;
 
     public override void OnStartClient()
     {
         base.OnStartClient();
         enabled = IsOwner;
     }
-    
+
+    private void Awake()
+    {
+        cameraController = GetComponent<PlayerCameraControllerNB>();
+    }
+
     public void SetupWeapon(GameObject weaponPrefab, NetworkConnection conn)
     {
         SpawnWeaponServer(weaponPrefab, conn);
@@ -29,14 +38,14 @@ public class PlayerWeaponManagerNB : NetworkBehaviour
     }
     
     
-    public void OnAttack(InputAction.CallbackContext ctx)
+    public void OnShoot(InputAction.CallbackContext ctx)
     {
-        if (ctx.performed)
+        if (ctx.performed && actualWeapon != null)
             Shoot();
     }
 
     private void Shoot()
     {
-        throw new System.NotImplementedException();
+        actualWeapon.Fire(transform,enemiesLayerMask);
     }
 }

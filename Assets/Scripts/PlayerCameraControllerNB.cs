@@ -16,6 +16,7 @@ public class PlayerCameraControllerNB : NetworkBehaviour
     [SerializeField] private Transform cameraTransform;
 
     private Camera playerCamera;
+    public Camera PlayerCamera => playerCamera;
 
     public override void OnStartClient()
     {

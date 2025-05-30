@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 305121930612830166}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: CameraHolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5452489451898405940}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: WeaponHolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -72,7 +72,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 166297498174653744}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: TransformsHolders
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -115,7 +115,8 @@ GameObject:
   - component: {fileID: 2300676277740862292}
   - component: {fileID: 4654956927199818361}
   - component: {fileID: 7279810257039062743}
-  m_Layer: 0
+  - component: {fileID: 2360652190556464947}
+  m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -244,6 +245,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: e56e595b-3e44-4b97-9048-9fdeda7d301a
     m_ActionName: 'Player/Sprinting[/Keyboard/leftShift]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6775675407886774526}
+        m_TargetAssemblyTypeName: PlayerWeaponManagerNB, Assembly-CSharp
+        m_MethodName: OnShoot
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 7ca7497f-1064-48a7-8d8a-33f3859d8056
+    m_ActionName: 'Player/Shoot[/Mouse/leftButton]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -325,6 +342,7 @@ MonoBehaviour:
   checkGroundTransform: {fileID: 2931645753578735975}
   playerRenderer: {fileID: 2164230359573355464}
   lookInputReference: {fileID: -917103242811739157, guid: 207eef2aedef0d0419c29e1a208146c5, type: 3}
+  playerInput: {fileID: 4152088571265611662}
 --- !u!114 &-205032012945666673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -376,6 +394,9 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 2300676277740862292}
   _networkObjectCache: {fileID: 2300676277740862292}
   weaponHolder: {fileID: 5452489451898405940}
+  enemiesLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!114 &2300676277740862292
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -400,6 +421,7 @@ MonoBehaviour:
   - {fileID: 6579877668154463229}
   - {fileID: 6775675407886774526}
   - {fileID: 4654956927199818361}
+  - {fileID: 2360652190556464947}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -491,6 +513,21 @@ MonoBehaviour:
   _overrideType: 3
   _updateHostVisibility: 1
   _observerConditions: []
+--- !u!114 &2360652190556464947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3837193550059743189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 885a9e142eb14d42be451b5ddbd3fd5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 5
+  _addedNetworkObject: {fileID: 2300676277740862292}
+  _networkObjectCache: {fileID: 2300676277740862292}
 --- !u!1 &6319443831672547884
 GameObject:
   m_ObjectHideFlags: 0
@@ -500,7 +537,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2931645753578735975}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: CheckGroundPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -534,7 +571,7 @@ GameObject:
   - component: {fileID: 9003964980941206698}
   - component: {fileID: 2164230359573355464}
   - component: {fileID: 8810064503517405946}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: CapsulePlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
