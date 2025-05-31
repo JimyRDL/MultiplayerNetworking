@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using FishNet.Object;
+using Unity.VisualScripting;
 using UnityEngine.InputSystem;
 using Quaternion = UnityEngine.Quaternion;
 
@@ -32,15 +33,31 @@ public class PlayerControllerNB : NetworkBehaviour
      private bool isGrounded = true;
      private bool isSprinting = false;
 
+     private void OnEnable()
+     {
+          EventManager.AddListener<CountdownFinishedEvent>(FinishedCountdown);
+     }
+
+     private void OnDisable()
+     {
+          EventManager.RemoveListener<CountdownFinishedEvent>(FinishedCountdown);
+     }
+
+     private void FinishedCountdown(CountdownFinishedEvent evt)
+     {
+          playerInput.enabled = true;
+     }
+
      public override void OnStartClient()
      {
           base.OnStartClient();
           if (!IsOwner)
           {
                enabled = false;
-               playerInput.enabled = false;
                return;
           }
+
+          playerInput.enabled = false;
           Cursor.lockState = CursorLockMode.Locked;
      }
 

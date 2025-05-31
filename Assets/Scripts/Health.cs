@@ -9,17 +9,35 @@ public abstract class Health : NetworkBehaviour
     protected int MaxHealth = 100;
     public readonly SyncVar<int> currentHealth = new SyncVar<int>();
 
-    private void Start()
+    public override void OnStartClient()
     {
+        base.OnStartClient();
+        currentHealth.OnChange += HealthChanged;
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
         currentHealth.Value = MaxHealth;
     }
+    
+    private void OnDestroy()
+    {
+        currentHealth.OnChange -= HealthChanged;
+    }
+
+    protected virtual void HealthChanged(int prev, int next, bool asserver)
+    {
+        
+    }
+
 
     public void TakeDamage(int damage)
     
     {
         currentHealth.Value -= damage;
         currentHealth.Value = Mathf.Clamp(currentHealth.Value, 0, MaxHealth);
-        Debug.Log($"Player {gameObject.name } was hit and has {currentHealth.Value} health ");
+        Debug.Log($"Player {gameObject.name } was hit and has {currentHealth.Value} health ");        
         CheckDeath();
     }
 

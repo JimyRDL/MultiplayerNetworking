@@ -34,7 +34,13 @@ public class PlayerWeaponManagerNB : NetworkBehaviour
     {
         GameObject weaponGO = Instantiate(weaponPrefab);
         Spawn(weaponGO, conn);
-        actualWeapon = weaponGO.GetComponent<Weapon>();
+        ObserverAssignWeapon(weaponGO.GetComponent<Weapon>());
+    }
+
+    [ObserversRpc]
+    private void ObserverAssignWeapon(Weapon weapon)
+    {
+        actualWeapon = weapon;
     }
     
     
@@ -46,6 +52,7 @@ public class PlayerWeaponManagerNB : NetworkBehaviour
 
     private void Shoot()
     {
+        Debug.Log("Shoot");
         actualWeapon.Fire(transform,enemiesLayerMask);
     }
 }
