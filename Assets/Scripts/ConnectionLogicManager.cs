@@ -44,7 +44,11 @@ public class ConnectionLogicManager : MonoBehaviour
     {
         if (obj.ConnectionState == LocalConnectionState.Stopping && hasJoined)
         {
+            #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
+            #else
+            Application.Quit();
+#endif
         }
 
         if (obj.ConnectionState == LocalConnectionState.Started)
