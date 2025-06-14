@@ -11,6 +11,8 @@ public class GameStarterManager : NetworkBehaviour
     private int countdown = 4;
     [SerializeField] private TextMeshProUGUI countdownText;
     [SerializeField] private GameObject countdownParent;
+    [SerializeField] private Transform[] spawnPoints;
+    private int spawnIndex = 0;
 
     private void OnEnable()
     {
@@ -25,7 +27,7 @@ public class GameStarterManager : NetworkBehaviour
 
     public override void OnStartClient()
     {
-        base.OnStartServer();
+        base.OnStartClient();
         UpdateCountdownClient(3);
     }
 
@@ -47,8 +49,7 @@ public class GameStarterManager : NetworkBehaviour
     {
         countdownParent.SetActive(true);
     }
-
-    [Server]
+    
     private IEnumerator CoroutineCountdown()
     {
         while (countdown > 0)
@@ -60,6 +61,12 @@ public class GameStarterManager : NetworkBehaviour
         FinishedCountdown();
     }
 
+    public Vector3 GetNextSpawnPoint()
+    {
+        Vector3 pos = spawnPoints[spawnIndex % spawnPoints.Length].position;
+        spawnIndex++;
+        return pos;
+    }
     [ObserversRpc]
     private void FinishedCountdown()
     {

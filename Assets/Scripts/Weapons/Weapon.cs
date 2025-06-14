@@ -48,21 +48,28 @@ public abstract class Weapon : NetworkBehaviour
         Ray ray = new Ray(origin, direction);
         Debug.DrawRay(ray.origin, ray.direction, Color.red);
         RaycastHit[] hits = Physics.RaycastAll(ray, 100f);
+
+        RaycastHit? closestValidHit = null;
+        float closestDistance = float.MaxValue;
+        
         foreach (var hit in hits)
         {
             if (hit.collider.transform.root == transform.root)
                 continue;
-            Debug.Log(hit.collider.gameObject.name + "  hit");
-            
-            var health = hit.collider.transform.root.GetComponent<Health>();
+            if (hit.distance < closestDistance)
+            {
+                closestDistance = hit.distance;
+                closestValidHit = hit;
+            }
+        }
+
+        if (closestValidHit.HasValue)
+        {
+            var health = closestValidHit.Value.collider.transform.root.GetComponent<Health>();
             if (health != null)
             {
-                Debug.Log(hit);
                 health.TakeDamage(damage);
-                break;
             }
-            
         }
-        Debug.Log("FiredServer");
     }
 }

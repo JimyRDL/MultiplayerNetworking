@@ -30,10 +30,13 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
      [SerializeField] private List<Button> weaponButtons;
      [SerializeField] private Button weapon1Button;
      [SerializeField] private Button weapon2Button;
+     
+     private GameStarterManager gameStarterManager;
 
      private void Awake()
      {
           networkManager = InstanceFinder.NetworkManager;
+          gameStarterManager = FindAnyObjectByType<GameStarterManager>();
      }
 
      public override void OnStartClient()
@@ -75,7 +78,6 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
      [Server]
      private void StartGameServer()
      {
-          Debug.Log("StartGameServer");
           int connectionCount = networkManager.ServerManager.Clients.Count;
           int playersReady = 0;
           var players = new List<NetworkObject>(InstanceFinder.ServerManager.Objects.Spawned.Values);
@@ -83,16 +85,12 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
           {
                if (obj.TryGetComponent(out PlayerLobbyControllerNB player))
                {
-                    Debug.Log($"Players {obj.name} IsReady {player.IsReady.Value}");
                     if(player.IsReady.Value)
                          playersReady++;
                }
           }
-          Debug.Log("Connection Count: " + connectionCount);
-          Debug.Log("PlayersReady: " + playersReady);
           if (connectionCount != playersReady)
                return;
-          Debug.Log("StartedGameServer");
           foreach (var obj in players)
           {
                if (obj.TryGetComponent<PlayerLobbyControllerNB>(out var player))
@@ -153,8 +151,10 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
      private void SpawnCharacter(NetworkConnection conn)
      {
           GameObject player = Instantiate(characterPrefab);
-          player.SetActive(true);
+          player.SetActive(false);
           player.gameObject.name = "Player" + conn;
+          player.transform.position = gameStarterManager.GetNextSpawnPoint();
+          player.SetActive(true);
           Spawn(player, conn);
 
           if (player.TryGetComponent(out PlayerWeaponManagerNB weaponManager))
