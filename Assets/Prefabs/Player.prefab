@@ -116,6 +116,7 @@ GameObject:
   - component: {fileID: 4654956927199818361}
   - component: {fileID: 7279810257039062743}
   - component: {fileID: 2360652190556464947}
+  - component: {fileID: -7954247288281623296}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -447,7 +448,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 9
+  <PrefabId>k__BackingField: 10
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 7807759643866311769
   <SceneId>k__BackingField: 0
@@ -531,6 +532,23 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 2300676277740862292}
   healthParent: {fileID: 3900200104065671871}
   healthBar: {fileID: 8654257494957340001}
+--- !u!114 &-7954247288281623296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3837193550059743189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e08bb003fce297d4086cf8cba5aa459a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _dropExcessiveReplicates: 1
+  _maximumServerReplicates: 15
+  _createLocalStates: 1
+  _stateInterpolation: 2
+  _stateOrder: 1
 --- !u!1 &3900200104065671871
 GameObject:
   m_ObjectHideFlags: 0
