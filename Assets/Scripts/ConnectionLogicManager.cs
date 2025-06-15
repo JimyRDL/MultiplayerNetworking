@@ -100,8 +100,13 @@ public class ConnectionLogicManager : MonoBehaviour
 
     private void OpenJoinClient()
     {
+        #if UNITY_EDITOR
+        tugboat.SetClientAddress("localhost");
+        networkManager.ClientManager.StartConnection();
+        #else 
         mainButtonsParent.SetActive(false);
         enterHostAddressPanel.SetActive(true);
+        #endif
     }
 
     private void StartHost()

@@ -7,12 +7,16 @@ using UnityEngine.InputSystem;
 
 public class PlayerWeaponManagerNB : NetworkBehaviour
 {
-    
-    public Transform weaponHolder;
+    [Header("Script References")]
     private Weapon actualWeapon;
 
+    public GameObject ActualWeaponPrefab; 
+    private PlayerTeamManager playerTeamManager;
     private PlayerCameraControllerNB cameraController;
+    
+    [Header("Scene References")]
     [SerializeField] private LayerMask enemiesLayerMask;
+    public Transform weaponHolder;
 
     public override void OnStartClient()
     {
@@ -23,6 +27,7 @@ public class PlayerWeaponManagerNB : NetworkBehaviour
     private void Awake()
     {
         cameraController = GetComponent<PlayerCameraControllerNB>();
+        
     }
 
     public void SetupWeapon(GameObject weaponPrefab, NetworkConnection conn)
@@ -34,14 +39,16 @@ public class PlayerWeaponManagerNB : NetworkBehaviour
     {
         GameObject weaponGO = Instantiate(weaponPrefab);
         Spawn(weaponGO, conn);
-        ObserverAssignWeapon(weaponGO.GetComponent<Weapon>());
+        ObserverAssignWeapon(weaponGO.GetComponent<Weapon>(), weaponGO);
     }
 
     [ObserversRpc]
-    private void ObserverAssignWeapon(Weapon weapon)
+    private void ObserverAssignWeapon(Weapon weapon, GameObject weaponGO)
     {
         actualWeapon = weapon;
+        ActualWeaponPrefab = weaponGO;
     }
+    
     
     
     public void OnShoot(InputAction.CallbackContext ctx)
@@ -52,7 +59,6 @@ public class PlayerWeaponManagerNB : NetworkBehaviour
 
     private void Shoot()
     {
-        Debug.Log("Shoot");
         actualWeapon.Fire(transform,enemiesLayerMask);
     }
 }

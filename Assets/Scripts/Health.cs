@@ -33,11 +33,9 @@ public abstract class Health : NetworkBehaviour
 
 
     public void TakeDamage(int damage)
-    
     {
         currentHealth.Value -= damage;
         currentHealth.Value = Mathf.Clamp(currentHealth.Value, 0, MaxHealth);
-        Debug.Log($"Player {gameObject.name } was hit and has {currentHealth.Value} health ");        
         CheckDeath();
     }
 

@@ -33,6 +33,7 @@ public class PlayerControllerNB : NetworkBehaviour
      private bool isGrounded = true;
      private bool isSprinting = false;
 
+
      private void OnEnable()
      {
           EventManager.AddListener<CountdownFinishedEvent>(FinishedCountdown);
@@ -57,7 +58,13 @@ public class PlayerControllerNB : NetworkBehaviour
                return;
           }
 
-          playerInput.enabled = false;
+          if (GameManager.actualState == GameManager.GameState.StartingGame)
+          {
+               playerInput.enabled = false;
+          } else if (GameManager.actualState == GameManager.GameState.Game)
+          {
+               playerInput.enabled = true;
+          }
           Cursor.lockState = CursorLockMode.Locked;
      }
 

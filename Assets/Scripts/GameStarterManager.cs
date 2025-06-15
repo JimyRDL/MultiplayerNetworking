@@ -67,6 +67,7 @@ public class GameStarterManager : NetworkBehaviour
         spawnIndex++;
         return pos;
     }
+    
     [ObserversRpc]
     private void FinishedCountdown()
     {

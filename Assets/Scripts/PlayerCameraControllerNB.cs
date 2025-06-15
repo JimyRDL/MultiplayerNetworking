@@ -15,6 +15,7 @@ public class PlayerCameraControllerNB : NetworkBehaviour
     [Header("References")]
     [SerializeField] private Transform cameraTransform;
 
+    [SerializeField]
     private Camera playerCamera;
     public Camera PlayerCamera => playerCamera;
 
@@ -23,7 +24,6 @@ public class PlayerCameraControllerNB : NetworkBehaviour
         base.OnStartClient();
         if (IsOwner)
         {
-            playerCamera = Camera.main;
             playerCamera.transform.SetParent(cameraTransform);
             playerCamera.transform.localPosition = Vector3.zero;
             playerCamera.transform.localRotation = Quaternion.identity;
@@ -32,6 +32,7 @@ public class PlayerCameraControllerNB : NetworkBehaviour
         }
         else
         {
+            playerCamera.gameObject.SetActive(false);
             gameObject.GetComponent<PlayerCameraControllerNB>().enabled = false; 
         }
     }

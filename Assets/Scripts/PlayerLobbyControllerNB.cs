@@ -15,6 +15,7 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
      [SerializeField] private List<GameObject> weapons = new();
      public readonly SyncVar<int> actualWeaponIndex = new SyncVar<int>();
      public readonly SyncVar<bool> IsReady = new SyncVar<bool>(false);
+     public readonly SyncVar<GameManager.Teams> ActualTeamPlayer = new(GameManager.Teams.None);
 
      [Header("Canvas")] 
      [SerializeField] private GameObject canvasParent;
@@ -25,11 +26,14 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
      [SerializeField] private Button goToWeaponSelectionButton;
      [SerializeField] private Button setReadyButton;
      [SerializeField] private Button startGameButton;
+     [SerializeField] private Button blueTeamButton;
+     [SerializeField] private Button redTeamButton;
      
      [Header("Select Weapon Items")]
      [SerializeField] private List<Button> weaponButtons;
      [SerializeField] private Button weapon1Button;
      [SerializeField] private Button weapon2Button;
+     
      
      private GameStarterManager gameStarterManager;
 
@@ -44,15 +48,21 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
           base.OnStartClient();
           canvasParent.SetActive(IsOwner);
           IsReady.OnChange += OnReadyChanged;
+          ActualTeamPlayer.OnChange += OnTeamChanged;
           if (!IsServerStarted)
           {
                startGameButton.gameObject.SetActive(false);
           }
+          if(IsOwner)
+               Destroy(Camera.main.gameObject);
      }
+
+     
 
      private void OnDestroy()
      {
           IsReady.OnChange -= OnReadyChanged;
+          ActualTeamPlayer.OnChange -= OnTeamChanged;
      }
 
 
@@ -66,8 +76,38 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
           weapon1Button.onClick.AddListener(() => SelectWeapon(0, weapon1Button));
           weapon2Button.onClick.AddListener(() => SelectWeapon(1, weapon2Button));
           
+          blueTeamButton.onClick.AddListener(() => SelectTeam(GameManager.Teams.Blue));
+          redTeamButton.onClick.AddListener(() => SelectTeam(GameManager.Teams.Red));
      }
-     
+
+     private void OnTeamChanged(GameManager.Teams prev, GameManager.Teams next, bool asserver)
+     {
+          if (!IsOwner)
+               return;
+          if (next == GameManager.Teams.Blue)
+          {
+               blueTeamButton.image.color = Color.green;
+               redTeamButton.image.color = Color.white;
+          } else if (next == GameManager.Teams.Red)
+          {
+               blueTeamButton.image.color = Color.white;
+               redTeamButton.image.color = Color.green;
+          }
+     }
+     private void SelectTeam(GameManager.Teams team)
+     {
+          if (IsReady.Value)
+               return;
+          SelectTeamServerRPC(team);
+         
+     }
+
+     [ServerRpc]
+     private void SelectTeamServerRPC(GameManager.Teams team)
+     {
+          ActualTeamPlayer.Value = team;
+     }
+
      private void StartGame()
      {
           if (!IsServerStarted)
@@ -95,7 +135,7 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
           {
                if (obj.TryGetComponent<PlayerLobbyControllerNB>(out var player))
                {
-                    player.SpawnCharacter(player.Owner);
+                    player.SpawnCharacter(player.Owner, player.ActualTeamPlayer.Value);
                }
           }
           EventManager.Broadcast(Events.startCountdownEvent);
@@ -110,6 +150,8 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
      
      private void SetReady()
      {
+          if (ActualTeamPlayer.Value == GameManager.Teams.None)
+               return;
           SetReadyServer();
      }
      private void OnReadyChanged(bool prev, bool next, bool asserver)
@@ -148,13 +190,14 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
      
 
      [Server]
-     private void SpawnCharacter(NetworkConnection conn)
+     private void SpawnCharacter(NetworkConnection conn, GameManager.Teams team)
      {
           GameObject player = Instantiate(characterPrefab);
           player.SetActive(false);
-          player.gameObject.name = "Player" + conn;
+          ChangeNameObserverRPC(player, "Player " + conn);
           player.transform.position = gameStarterManager.GetNextSpawnPoint();
           player.SetActive(true);
+          player.GetComponent<PlayerTeamManager>().team.Value = team;
           Spawn(player, conn);
 
           if (player.TryGetComponent(out PlayerWeaponManagerNB weaponManager))
@@ -162,7 +205,14 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
                weaponManager.SetupWeapon(weapons[actualWeaponIndex.Value], conn);
           }
 
+      
           SpawnCharacterObserver();
+     }
+
+     [ObserversRpc]
+     private void ChangeNameObserverRPC(GameObject player, string newName)
+     {
+          player.gameObject.name = newName;
      }
      
      [ObserversRpc]
