@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: -5851051682677377231}
   - component: {fileID: 4794083571525517353}
   m_Layer: 0
-  m_Name: Weapon
+  m_Name: Assault Rifle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -86,7 +86,7 @@ MonoBehaviour:
   _teleportThreshold: 1
   <PrefabId>k__BackingField: 10
   <SpawnableCollectionId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 11589116817743326467
+  <AssetPathHash>k__BackingField: 12232640566055203035
   <SceneId>k__BackingField: 0
   SerializedTransformProperties:
     Position: {x: 0, y: 0, z: 0}
@@ -109,6 +109,8 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: -5851051682677377231}
   _networkObjectCache: {fileID: 0}
   damage: 10
+  firePosition: {fileID: 8391249699144570646}
+  bulletPrefab: {fileID: 5421831240011298748, guid: c833f67fe02564c18bb9aff616b52034, type: 3}
 --- !u!1 &1000011046169406
 GameObject:
   m_ObjectHideFlags: 0
@@ -655,7 +657,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 8391249699144570646}
   m_Father: {fileID: 4000013430562122}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &33000012801655658
@@ -711,3 +714,34 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &2979233417774329501
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8391249699144570646}
+  m_Layer: 0
+  m_Name: FirePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8391249699144570646
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2979233417774329501}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 4.91}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4000013578007500}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

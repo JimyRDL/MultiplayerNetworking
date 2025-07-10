@@ -8,6 +8,7 @@ public class PlayerHealthNB : Health
 {
     [SerializeField] private GameObject healthParent;
     [SerializeField] private Image healthBar;
+    [SerializeField] private Image healthBarTopPlayer;
 
     
     private PlayerTeamManager playerTeamManager;
@@ -26,6 +27,7 @@ public class PlayerHealthNB : Health
     {
         base.HealthChanged(prev, next, asserver);
         healthBar.fillAmount = next / (float)MaxHealth;
+        healthBarTopPlayer.fillAmount = next / (float)MaxHealth;
     }
 
     protected override void Die()

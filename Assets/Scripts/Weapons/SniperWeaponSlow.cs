@@ -1,8 +1,9 @@
-﻿using System.Collections;
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
-public class ARWeaponFast : Weapon
+public class SniperWeaponSlow : Weapon
 {
-    private float cooldown = 0.25f;
+    private float cooldown = 2f;
     private bool inCooldown = false;
     public override void Fire(Transform cameraTransform,LayerMask mask)
     {
@@ -20,3 +21,4 @@ public class ARWeaponFast : Weapon
         inCooldown = false;
     }
 }
+

@@ -1,9 +1,11 @@
 using System;
+using System.Collections;
 using FishNet.Connection;
 using FishNet.Example.ColliderRollbacks;
 using FishNet.Object;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 public class PlayerWeaponManagerNB : NetworkBehaviour
 {
@@ -15,8 +17,10 @@ public class PlayerWeaponManagerNB : NetworkBehaviour
     private PlayerCameraControllerNB cameraController;
     
     [Header("Scene References")]
-    [SerializeField] private LayerMask enemiesLayerMask;
+    [SerializeField] private LayerMask playersLayerMask;
     public Transform weaponHolder;
+    [SerializeField] private GameObject hitmarkerPrefab;
+    [SerializeField] private Transform hitmarkerParent;
 
     public override void OnStartClient()
     {
@@ -59,6 +63,21 @@ public class PlayerWeaponManagerNB : NetworkBehaviour
 
     private void Shoot()
     {
-        actualWeapon.Fire(transform,enemiesLayerMask);
+        actualWeapon.Fire(cameraController.PlayerCamera.transform,playersLayerMask);
+    }
+
+    [TargetRpc]
+    public void ShowHitMarker(NetworkConnection conn)
+    {
+        if (conn != Owner)
+            return;
+        GameObject hitmarker = Instantiate(hitmarkerPrefab, hitmarkerParent);
+        StartCoroutine(HideHitmarker(hitmarker));
+    }
+    
+    private IEnumerator HideHitmarker(GameObject hitmarker)
+    {
+        yield return new WaitForSeconds(0.5f);
+        Destroy(hitmarker);
     }
 }

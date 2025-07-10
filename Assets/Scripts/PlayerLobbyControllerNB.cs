@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using FishNet;
 using FishNet.Connection;
@@ -28,11 +29,16 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
      [SerializeField] private Button startGameButton;
      [SerializeField] private Button blueTeamButton;
      [SerializeField] private Button redTeamButton;
+     [SerializeField] private GameObject textPlayersNotReady;
+     [SerializeField] private GameObject messageTheyCantBeReady;
+     [SerializeField] private GameObject selectWeaponIndicator;
      
      [Header("Select Weapon Items")]
      [SerializeField] private List<Button> weaponButtons;
      [SerializeField] private Button weapon1Button;
+     [SerializeField] private Transform selectionW1Transform;
      [SerializeField] private Button weapon2Button;
+     [SerializeField] private Transform selectionW2Transform;
      
      
      private GameStarterManager gameStarterManager;
@@ -49,6 +55,7 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
           canvasParent.SetActive(IsOwner);
           IsReady.OnChange += OnReadyChanged;
           ActualTeamPlayer.OnChange += OnTeamChanged;
+          actualWeaponIndex.Value = -1;
           if (!IsServerStarted)
           {
                startGameButton.gameObject.SetActive(false);
@@ -73,8 +80,8 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
           startGameButton.onClick.AddListener(StartGame);
           
           
-          weapon1Button.onClick.AddListener(() => SelectWeapon(0, weapon1Button));
-          weapon2Button.onClick.AddListener(() => SelectWeapon(1, weapon2Button));
+          weapon1Button.onClick.AddListener(() => SelectWeapon(0, weapon1Button, selectionW1Transform));
+          weapon2Button.onClick.AddListener(() => SelectWeapon(1, weapon2Button, selectionW2Transform));
           
           blueTeamButton.onClick.AddListener(() => SelectTeam(GameManager.Teams.Blue));
           redTeamButton.onClick.AddListener(() => SelectTeam(GameManager.Teams.Red));
@@ -129,8 +136,13 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
                          playersReady++;
                }
           }
+
           if (connectionCount != playersReady)
+          {
+               textPlayersNotReady.SetActive(true);
+               StartCoroutine(DeactivateText(textPlayersNotReady));
                return;
+          }
           foreach (var obj in players)
           {
                if (obj.TryGetComponent<PlayerLobbyControllerNB>(out var player))
@@ -142,6 +154,12 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
           ObserveStartGame();
      }
 
+     private IEnumerator DeactivateText(GameObject text)
+     {
+          yield return new WaitForSeconds(3f);
+          text.SetActive(false);
+     }
+
      [ObserversRpc]
      private void ObserveStartGame()
      {
@@ -150,13 +168,18 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
      
      private void SetReady()
      {
-          if (ActualTeamPlayer.Value == GameManager.Teams.None)
+          if (ActualTeamPlayer.Value == GameManager.Teams.None ||
+              (actualWeaponIndex.Value != 0 && actualWeaponIndex.Value != 1))
+          {
+               messageTheyCantBeReady.SetActive(true);
+               StartCoroutine(DeactivateText(messageTheyCantBeReady));
                return;
+          }
           SetReadyServer();
      }
      private void OnReadyChanged(bool prev, bool next, bool asserver)
      {
-          setReadyButton.image.color = next ? Color.green : Color.red;
+          setReadyButton.image.color = next ? Color.green : Color.gray;
      }
 
      [ServerRpc]
@@ -171,14 +194,17 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
           
      }
 
-     private void SelectWeapon(int index, Button actualButton)
+     private void SelectWeapon(int index, Button actualButton, Transform selectionTransform)
      {
+          if (IsReady.Value)
+               return;
           foreach (var button in weaponButtons)
           {
-               button.image.color = Color.gray;
+               button.image.color = new Color32(255, 255, 255, 110);
           }
-
-          actualButton.image.color = Color.green;
+          selectWeaponIndicator.SetActive(true);
+          selectWeaponIndicator.transform.position = selectionTransform.position;
+          actualButton.image.color = Color.white;
           SelectActualWeaponServer(index);
      }
 

@@ -1,9 +1,11 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using FishNet.Connection;
+using FishNet.Managing.Scened;
 using UnityEngine;
 using FishNet.Object;
-using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
 public class GameManager : NetworkBehaviour
 {
@@ -12,6 +14,8 @@ public class GameManager : NetworkBehaviour
      private int blueTeamScore;
      private int redTeamScore;
      private int maxTeamScore = 10;
+     [Header("Scene References")]
+     [SerializeField] private Transform[] spawnPoints;
      [Header("Project References")]
      [SerializeField]
      private GameObject playerPrefab;
@@ -85,20 +89,38 @@ public class GameManager : NetworkBehaviour
           {
                blueTeamScore++;
           }
-          Debug.Log($"BlueTeamScore: {blueTeamScore}, RedTeamScore: {redTeamScore}, MaxTeamScore: {maxTeamScore}");
           CheckScores();
           UpdateScoresUI(blueTeamScore, redTeamScore, maxTeamScore);
      }
 
      private void CheckScores()
      {
+          bool someoneWon = false;
           if (blueTeamScore >= maxTeamScore)
           {
-               Debug.Log("Bluewon");
+               KeepTrackScores.teamWon = 0;
+               someoneWon = true;
           } else if (redTeamScore >= maxTeamScore)
           {
-               Debug.Log("Redwon");
+               KeepTrackScores.teamWon = 1;
+               someoneWon = true;
           }
+
+          if (!someoneWon)
+               return;
+          StartCoroutine(ChangeScene());
+          
+     }
+
+     private IEnumerator ChangeScene()
+     {
+          yield return new WaitForSeconds(1f);
+          SceneLoadData scene = new SceneLoadData("EndScene")
+          {
+               ReplaceScenes = ReplaceOption.All
+          };
+          SceneManager.UnloadGlobalScenes(new SceneUnloadData("MainScene"));
+          SceneManager.LoadGlobalScenes(scene);
      }
 
      [ObserversRpc]
@@ -114,13 +136,42 @@ public class GameManager : NetworkBehaviour
           UIManager.Instance.UpdateScoresUI(BTS, RTS, MTS);
      }
 
+     
+     // Feedback: Respawn everything automatically might create problems, create a delay, with a coroutine
      private void RespawnPlayer(GameObject playerToKill, NetworkConnection connection)
      {
           GameObject previousWeapon = playerToKill.GetComponent<PlayerWeaponManagerNB>().ActualWeaponPrefab;
+          Teams previousTeam = playerToKill.GetComponent<PlayerTeamManager>().team.Value;
           Despawn(playerToKill);
+          
+          
+          
           GameObject playerGO = Instantiate(playerPrefab);
+          playerGO.SetActive(false);
+          playerGO.transform.position = GetSpawnPointFree().position;
+          playerGO.SetActive(true);
           Spawn(playerGO, connection);
+          playerGO.GetComponent<PlayerTeamManager>().team.Value = previousTeam;
           PlayerWeaponManagerNB weaponManager = playerGO.GetComponent<PlayerWeaponManagerNB>();
           weaponManager.SetupWeapon(previousWeapon, connection);
+     }    
+
+     private Transform GetSpawnPointFree()
+     {
+          List<Transform> availableSpawnPoints = new();
+          foreach (Transform spawnPoint in spawnPoints)
+          {
+               Collider[] hits =  Physics.OverlapSphere(spawnPoint.position, 10f, LayerMask.GetMask("Player"));
+               if(hits.Length == 0) availableSpawnPoints.Add(spawnPoint);
+          }
+
+          if (availableSpawnPoints.Count > 0)
+          {
+               return availableSpawnPoints[UnityEngine.Random.Range(0, availableSpawnPoints.Count)];
+          }
+          else
+          {
+               return spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Length)];
+          }
      }
 }

@@ -103,7 +103,7 @@ public class ConnectionLogicManager : MonoBehaviour
         #if UNITY_EDITOR
         tugboat.SetClientAddress("localhost");
         networkManager.ClientManager.StartConnection();
-        #else 
+        #else
         mainButtonsParent.SetActive(false);
         enterHostAddressPanel.SetActive(true);
         #endif
