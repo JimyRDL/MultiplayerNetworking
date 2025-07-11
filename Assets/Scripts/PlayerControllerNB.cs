@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using DefaultNamespace;
 using UnityEngine;
 using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using Unity.VisualScripting;
 using UnityEngine.InputSystem;
 using Quaternion = UnityEngine.Quaternion;
@@ -20,6 +22,8 @@ public class PlayerControllerNB : NetworkBehaviour
      private Vector3 movement;
 
      
+
+     
      [Header("References")]
      private Rigidbody playerRigidbody;
      [SerializeField] private LayerMask groundLayer;
@@ -33,7 +37,9 @@ public class PlayerControllerNB : NetworkBehaviour
      private bool isGrounded = true;
      private bool isSprinting = false;
 
-
+     public PlayerSessionNB PlayerSession;
+     
+    
      private void OnEnable()
      {
           EventManager.AddListener<CountdownFinishedEvent>(FinishedCountdown);
@@ -48,6 +54,7 @@ public class PlayerControllerNB : NetworkBehaviour
      {
           playerInput.enabled = true;
      }
+     
 
      public override void OnStartClient()
      {
@@ -57,7 +64,7 @@ public class PlayerControllerNB : NetworkBehaviour
                enabled = false;
                return;
           }
-
+          
           if (GameManager.actualState == GameManager.GameState.StartingGame)
           {
                playerInput.enabled = false;

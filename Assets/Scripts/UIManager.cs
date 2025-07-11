@@ -1,5 +1,7 @@
 ﻿
 using System;
+using System.Collections;
+using DefaultNamespace;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,6 +23,12 @@ public class UIManager : MonoBehaviour
     private Image redTeamScoreSlider;
 
     private PlayerTeamManager localPlayer;
+    [SerializeField] 
+    private GameObject killedFeedParent;
+    [SerializeField]
+    private TextMeshProUGUI killFeedPrefab;
+
+    private PlayerControllerNB localPlayer;
 
     private void Awake()
     {
@@ -38,13 +46,11 @@ public class UIManager : MonoBehaviour
 
     private void UpdateTeamColors()
     {
-        Debug.Log($"Updating Team Colors and localPlayer {localPlayer} and team {localPlayer.team.Value}");
         if (localPlayer.team.Value == GameManager.Teams.Blue)
         {
             blueTeamScoreSlider.color = Color.green;
             redTeamScoreSlider.color = Color.red;
         }
-        else if(localPlayer.team.Value == GameManager.Teams.Red)
         {
             blueTeamScoreSlider.color = Color.red;
             redTeamScoreSlider.color = Color.green;
@@ -57,6 +63,24 @@ public class UIManager : MonoBehaviour
         redTeamScoreText.text = redTeamScore.ToString();
         blueTeamScoreSlider.fillAmount = blueTeamScore / (float)maxTeamScore;
         redTeamScoreSlider.fillAmount = redTeamScore / (float)maxTeamScore;
+    }
+
+    public void UpdateKillFeed(string deadName, string shooterName, GameManager.Teams deadTeam, GameManager.Teams shooterTeam)
+    {
+        TextMeshProUGUI killFeedText = Instantiate(killFeedPrefab, killedFeedParent.transform);
+        PlayerSessionNB session = localPlayer.PlayerSession;
+        if(session.Team.Value == deadTeam && session.Team.Value != GameManager.Teams.None)
+            killFeedText.text = $"<color=red> {shooterName}</color> killed <color=green> {deadName} </color>";
+        else
+            killFeedText.text = $"<color=green> {shooterName}</color> killed <color=red> {deadName} </color>";
+        StartCoroutine(DisappearText(killFeedText.gameObject));
+
+    }
+
+    private IEnumerator DisappearText(GameObject text)
+    {
+        yield return new WaitForSeconds(3f);
+        Destroy(text);
     }
 
     public void ActivateScoresUI()

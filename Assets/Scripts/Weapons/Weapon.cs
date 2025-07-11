@@ -75,7 +75,7 @@ public abstract class Weapon : NetworkBehaviour
             if (health != null)
             {
                 weaponManager.ShowHitMarker(weaponManager.Owner);
-                health.TakeDamage(damage);
+                health.TakeDamage(damage, weaponManager.gameObject);
             }
         }
     }

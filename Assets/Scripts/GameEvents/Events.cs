@@ -18,8 +18,8 @@ public class CountdownFinishedEvent : GameEvent
 
 public class DieEvent : GameEvent
 {
-    public GameObject player;
+    public GameObject playerDead;
+    public GameObject playerShooter;
     public NetworkConnection connection; 
-    public GameManager.Teams team;
 }
 

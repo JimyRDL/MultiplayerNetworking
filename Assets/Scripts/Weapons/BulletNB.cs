@@ -31,6 +31,7 @@ public class BulletNB : NetworkBehaviour
     public void Setup(Vector3 direction, float speed)
     {
         velocity = direction * speed;
+        
         if (IsServerStarted)
         {
             rb.linearVelocity = velocity;

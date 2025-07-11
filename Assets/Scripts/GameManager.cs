@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DefaultNamespace;
 using FishNet.Connection;
 using FishNet.Managing.Scened;
 using UnityEngine;
@@ -25,6 +26,15 @@ public class GameManager : NetworkBehaviour
           Blue,
           Red
      }
+
+     public enum GameModes
+     {
+          TeamDeathmatch,
+          FreeForAll,
+          None
+     }
+     
+     public GameModes actualMode;
 
      public enum GameState
      {
@@ -76,10 +86,20 @@ public class GameManager : NetworkBehaviour
 
      private void PlayerDied(DieEvent evt)
      {
-          RespawnPlayer(evt.player, evt.connection);
-          UpdateScores(evt.team);
+          ShowKilledUI(evt.playerDead, evt.playerShooter);
+          UpdateScores(evt.playerDead.GetComponent<PlayerControllerNB>().PlayerSession.Team.Value);
+          RespawnPlayer(evt.playerDead, evt.connection);
      }
      
+     [ObserversRpc]
+     private void ShowKilledUI(GameObject playerDead, GameObject playerShooter)
+     {
+          UIManager.Instance.UpdateKillFeed(
+               playerDead.GetComponent<PlayerControllerNB>().PlayerSession.PlayerName.Value, 
+               playerShooter.GetComponent<PlayerControllerNB>().PlayerSession.PlayerName.Value, 
+               playerDead.GetComponent<PlayerControllerNB>().PlayerSession.Team.Value,
+               playerShooter.GetComponent<PlayerControllerNB>().PlayerSession.Team.Value);
+     }
      private void UpdateScores(Teams team)
      {
           if (team == Teams.Blue)
@@ -142,11 +162,14 @@ public class GameManager : NetworkBehaviour
      {
           GameObject previousWeapon = playerToKill.GetComponent<PlayerWeaponManagerNB>().ActualWeaponPrefab;
           Teams previousTeam = playerToKill.GetComponent<PlayerTeamManager>().team.Value;
+          PlayerControllerNB oldPlayerController = playerToKill.GetComponent<PlayerControllerNB>();
+          PlayerSessionNB oldSession = oldPlayerController.PlayerSession;
           Despawn(playerToKill);
           
           
           
           GameObject playerGO = Instantiate(playerPrefab);
+          playerGO.GetComponent<PlayerControllerNB>().InitializeSession(oldSession);
           playerGO.SetActive(false);
           playerGO.transform.position = GetSpawnPointFree().position;
           playerGO.SetActive(true);
@@ -155,6 +178,11 @@ public class GameManager : NetworkBehaviour
           PlayerWeaponManagerNB weaponManager = playerGO.GetComponent<PlayerWeaponManagerNB>();
           weaponManager.SetupWeapon(previousWeapon, connection);
      }    
+     [ObserversRpc]
+     private void ChangeNameObserverRPC(GameObject player, string newName)
+     {
+          player.gameObject.name = newName;
+     }
 
      private Transform GetSpawnPointFree()
      {

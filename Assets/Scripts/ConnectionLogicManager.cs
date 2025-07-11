@@ -116,6 +116,7 @@ public class ConnectionLogicManager : MonoBehaviour
         networkManager.ClientManager.StartConnection();
         Destroy(connectionLobbyCanvas);
     }
+    
 
     
     

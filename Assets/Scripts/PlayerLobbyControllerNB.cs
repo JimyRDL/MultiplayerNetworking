@@ -1,18 +1,21 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DefaultNamespace;
 using FishNet;
 using FishNet.Connection;
 using FishNet.Managing;
 using UnityEngine;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using TMPro;
 using UnityEngine.UI;
 
 public class PlayerLobbyControllerNB : NetworkBehaviour
 {
      private NetworkManager networkManager;
      [SerializeField] private GameObject characterPrefab;
+     [SerializeField] private GameObject playerSessionPrefab;
      [SerializeField] private List<GameObject> weapons = new();
      public readonly SyncVar<int> actualWeaponIndex = new SyncVar<int>();
      public readonly SyncVar<bool> IsReady = new SyncVar<bool>(false);
@@ -32,6 +35,7 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
      [SerializeField] private GameObject textPlayersNotReady;
      [SerializeField] private GameObject messageTheyCantBeReady;
      [SerializeField] private GameObject selectWeaponIndicator;
+     [SerializeField] private TMP_InputField nameInput;
      
      [Header("Select Weapon Items")]
      [SerializeField] private List<Button> weaponButtons;
@@ -78,7 +82,8 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
          // goToWeaponSelectionButton.onClick.AddListener(GoToWeaponSelection);
           setReadyButton.onClick.AddListener(SetReady);
           startGameButton.onClick.AddListener(StartGame);
-          
+          nameInput.onValueChanged.AddListener(OnNameChanged);
+
           
           weapon1Button.onClick.AddListener(() => SelectWeapon(0, weapon1Button, selectionW1Transform));
           weapon2Button.onClick.AddListener(() => SelectWeapon(1, weapon2Button, selectionW2Transform));
@@ -175,7 +180,14 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
                StartCoroutine(DeactivateText(messageTheyCantBeReady));
                return;
           }
+          SendPlayerNameServerRpc(playerName);
           SetReadyServer();
+     }
+     
+     [ServerRpc]
+     private void SendPlayerNameServerRpc(string name)
+     {
+          playerName = string.IsNullOrWhiteSpace(name) ? $"Player {Owner.ClientId}" : name;
      }
      private void OnReadyChanged(bool prev, bool next, bool asserver)
      {
@@ -214,16 +226,31 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
           actualWeaponIndex.Value = index;
      }
      
+     private string playerName = "";
+     
+
+     private void OnNameChanged(string newName)
+     {
+          playerName = newName.Trim();
+     }
 
      [Server]
      private void SpawnCharacter(NetworkConnection conn, GameManager.Teams team)
      {
+          GameObject playerSessionGO = Instantiate(playerSessionPrefab);
+          Spawn(playerSessionGO, conn);
+          PlayerSessionNB playerSession = playerSessionGO.GetComponent<PlayerSessionNB>();
           GameObject player = Instantiate(characterPrefab);
+          PlayerControllerNB playerController = player.GetComponent<PlayerControllerNB>();
+          string nameToGive = playerName;
           player.SetActive(false);
           ChangeNameObserverRPC(player, "Player " + conn);
           player.transform.position = gameStarterManager.GetNextSpawnPoint();
           player.SetActive(true);
           player.GetComponent<PlayerTeamManager>().team.Value = team;
+          playerSession.SetPlayerName(nameToGive);
+          playerSession.SetTeam(team);
+          playerController.InitializeSession(playerSession);
           Spawn(player, conn);
 
           if (player.TryGetComponent(out PlayerWeaponManagerNB weaponManager))
@@ -234,6 +261,7 @@ public class PlayerLobbyControllerNB : NetworkBehaviour
       
           SpawnCharacterObserver();
      }
+ 
 
      [ObserversRpc]
      private void ChangeNameObserverRPC(GameObject player, string newName)

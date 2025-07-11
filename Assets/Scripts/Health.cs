@@ -32,21 +32,21 @@ public abstract class Health : NetworkBehaviour
     }
 
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, GameObject playerShooter)
     {
         currentHealth.Value -= damage;
         currentHealth.Value = Mathf.Clamp(currentHealth.Value, 0, MaxHealth);
-        CheckDeath();
+        CheckDeath(playerShooter);
     }
 
-    private void CheckDeath()
+    private void CheckDeath(GameObject playerShooter)
     {
         if (currentHealth.Value <= 0)
         {
-            Die();
+            Die(playerShooter);
         }
     }
 
-    protected abstract void Die();
+    protected abstract void Die(GameObject playerShooter);
 
 }
